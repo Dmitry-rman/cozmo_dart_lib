@@ -198,12 +198,14 @@ class AudioRecorder {
 
           _stateStreamSubscription = stream.listen(
             (state) {
-              if (_stateStreamCtrl case final ctrl? when ctrl.hasListener) {
+              final ctrl = _stateStreamCtrl;
+              if (ctrl != null && ctrl.hasListener) {
                 ctrl.add(state);
               }
             },
             onError: (error) {
-              if (_stateStreamCtrl case final ctrl? when ctrl.hasListener) {
+              final ctrl = _stateStreamCtrl;
+              if (ctrl != null && ctrl.hasListener) {
                 ctrl.addError(error);
               }
             },
