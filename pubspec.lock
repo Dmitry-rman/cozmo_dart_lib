@@ -99,11 +99,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_web_plugins:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   flutter_webrtc:
     dependency: "direct main"
     description:
@@ -265,69 +260,13 @@ packages:
     source: hosted
     version: "3.1.6"
   plugin_platform_interface:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: plugin_platform_interface
       sha256: "4820fbfdb9478b1ebae27888254d445073732dae3d6ea81f0b7e06d5dedc3f02"
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-  record:
-    dependency: "direct main"
-    description:
-      path: "lib/third_party/record/record"
-      relative: true
-    source: path
-    version: "6.1.2"
-  record_android:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_android"
-      relative: true
-    source: path
-    version: "1.4.5"
-  record_ios:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_ios"
-      relative: true
-    source: path
-    version: "1.1.5"
-  record_linux:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_linux"
-      relative: true
-    source: path
-    version: "1.2.1"
-  record_macos:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_macos"
-      relative: true
-    source: path
-    version: "1.1.2"
-  record_platform_interface:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_platform_interface"
-      relative: true
-    source: path
-    version: "1.3.0"
-  record_web:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_web"
-      relative: true
-    source: path
-    version: "1.2.2"
-  record_windows:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_windows"
-      relative: true
-    source: path
-    version: "1.0.7"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -398,7 +337,7 @@ packages:
     source: hosted
     version: "1.4.0"
   uuid:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: uuid
       sha256: a11b666489b1954e01d992f3d601b1804a33937b5a8fe677bd26b8a9f96f96e8

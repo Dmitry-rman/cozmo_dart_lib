@@ -10,8 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_webrtc: ^0.9.48+1
-  record:
-    path: lib/third_party/record/record
+  uuid: ^4.0.0
+  plugin_platform_interface: ^2.1.8
   web_socket_channel: ^2.4.0
   http: ^1.2.0
 

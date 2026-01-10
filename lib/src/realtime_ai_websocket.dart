@@ -5,7 +5,7 @@ import 'dart:typed_data';
 
 import 'cozmo_robot.dart';
 import 'cozmo_utils.dart';
-import 'package:record/record.dart';
+import 'package:cozmo_dart_lib/record/record.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 
