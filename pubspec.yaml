@@ -10,6 +10,25 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_webrtc: ^0.9.48+1
+
+  # Local record package with all platform plugins
+  record:
+    path: lib/third_party/record/record
+  record_ios:
+    path: lib/third_party/record/record_ios
+  record_macos:
+    path: lib/third_party/record/record_macos
+  record_android:
+    path: lib/third_party/record/record_android
+  record_linux:
+    path: lib/third_party/record/record_linux
+  record_web:
+    path: lib/third_party/record/record_web
+  record_windows:
+    path: lib/third_party/record/record_windows
+  record_platform_interface:
+    path: lib/third_party/record/record_platform_interface
+
   uuid: ^4.0.0
   plugin_platform_interface: ^2.1.8
   web_socket_channel: ^2.4.0
