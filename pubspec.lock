@@ -275,58 +275,58 @@ packages:
   record:
     dependency: "direct main"
     description:
-      path: "lib/third_party/record/record"
-      relative: true
-    source: path
-    version: "6.1.2"
+      name: record
+      sha256: "2e3d56d196abcd69f1046339b75e5f3855b2406fc087e5991f6703f188aa03a6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.2.1"
   record_android:
     dependency: transitive
     description:
-      path: "lib/third_party/record/record_android"
-      relative: true
-    source: path
+      name: record_android
+      sha256: "9aaf3f151e61399b09bd7c31eb5f78253d2962b3f57af019ac5a2d1a3afdcf71"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.4.5"
-  record_ios:
+  record_darwin:
     dependency: transitive
     description:
-      path: "lib/third_party/record/record_ios"
-      relative: true
-    source: path
-    version: "1.1.5"
+      name: record_darwin
+      sha256: e487eccb19d82a9a39cd0126945cfc47b9986e0df211734e2788c95e3f63c82c
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.2"
   record_linux:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      path: "lib/third_party/record/record_linux"
-      relative: true
-    source: path
+      name: record_linux
+      sha256: "235b1f1fb84e810f8149cc0c2c731d7d697f8d1c333b32cb820c449bf7bb72d8"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.2.1"
-  record_macos:
-    dependency: transitive
-    description:
-      path: "lib/third_party/record/record_macos"
-      relative: true
-    source: path
-    version: "1.1.2"
   record_platform_interface:
     dependency: transitive
     description:
-      path: "lib/third_party/record/record_platform_interface"
-      relative: true
-    source: path
+      name: record_platform_interface
+      sha256: b0065fdf1ec28f5a634d676724d388a77e43ce7646fb049949f58c69f3fcb4ed
+      url: "https://pub.dev"
+    source: hosted
     version: "1.4.0"
   record_web:
     dependency: transitive
     description:
-      path: "lib/third_party/record/record_web"
-      relative: true
-    source: path
+      name: record_web
+      sha256: "3feeffbc0913af3021da9810bb8702a068db6bc9da52dde1d19b6ee7cb9edb51"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.2.2"
   record_windows:
     dependency: transitive
     description:
-      path: "lib/third_party/record/record_windows"
-      relative: true
-    source: path
+      name: record_windows
+      sha256: "223258060a1d25c62bae18282c16783f28581ec19401d17e56b5205b9f039d78"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.0.7"
   sky_engine:
     dependency: transitive

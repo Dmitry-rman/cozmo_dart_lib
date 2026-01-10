@@ -18,10 +18,10 @@
 @import path_provider_foundation;
 #endif
 
-#if __has_include(<record_ios/RecordIosPlugin.h>)
-#import <record_ios/RecordIosPlugin.h>
+#if __has_include(<record_darwin/RecordPlugin.h>)
+#import <record_darwin/RecordPlugin.h>
 #else
-@import record_ios;
+@import record_darwin;
 #endif
 
 @implementation GeneratedPluginRegistrant
@@ -29,7 +29,7 @@
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
   [FlutterWebRTCPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterWebRTCPlugin"]];
   [PathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"PathProviderPlugin"]];
-  [RecordIosPlugin registerWithRegistrar:[registry registrarForPlugin:@"RecordIosPlugin"]];
+  [RecordPlugin registerWithRegistrar:[registry registrarForPlugin:@"RecordPlugin"]];
 }
 
 @end
