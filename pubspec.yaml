@@ -10,7 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_webrtc: ^0.9.48+1
-  record: ^5.1.2
+  record:
+    path: lib/third_party/record/record
   web_socket_channel: ^2.4.0
   http: ^1.2.0
 
@@ -18,9 +19,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-
-dependency_overrides:
-  record_linux: ^1.2.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
