@@ -5,7 +5,7 @@ import 'dart:typed_data';
 
 import 'cozmo_robot.dart';
 import 'cozmo_utils.dart';
-import 'package:record/record.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -54,8 +54,9 @@ class RealtimeAIWebSocket {
   }
 
   // Захват микрофона
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  final FlutterSoundRecorder _audioRecorder = FlutterSoundRecorder();
   bool _isRecording = false;
+  StreamController<Uint8List>? _audioStreamController;
   StreamSubscription<Uint8List>? _audioStreamSubscription;
 
   // Аудио буфер
@@ -96,7 +97,12 @@ class RealtimeAIWebSocket {
     print('🔗 Подключение к OpenAI Realtime WebSocket API...');
 
     try {
-      // 0. Подключаемся к Cozmo
+      // 0. Инициализируем FlutterSoundRecorder
+      if (!_audioRecorder.isRecording) {
+        await _audioRecorder.openRecorder();
+      }
+
+      // 0.1. Подключаемся к Cozmo
       if (!_robot.isConnected) {
         print('🤖 Подключение к Cozmo...');
         try {
@@ -193,6 +199,9 @@ class RealtimeAIWebSocket {
     // 6. Очищаем буферы
     _audioBuffer.clear();
     _transcriptBuffer.clear();
+
+    // 7. Закрываем FlutterSoundRecorder
+    await _audioRecorder.closeRecorder();
 
     print('✅ Отключено');
   }
@@ -730,26 +739,11 @@ Remember: Your goal is to be a fun, educational robot friend - KEEP RESPONSES SH
     print('🎤 Запуск захвата микрофона...');
 
     try {
-      // Проверяем разрешения
-      if (!await _audioRecorder.hasPermission()) {
-        print('❌ Нет разрешения на микрофон');
-        return;
-      }
-
-      // Настраиваем запись: PCM16, 24000Hz, mono (как требует OpenAI)
-      final config = RecordConfig(
-        encoder: AudioEncoder.pcm16bits,
-        sampleRate: 24000,
-        numChannels: 1,
-      );
-
-      print('📝 Конфигурация записи: PCM16, 24000Hz, mono');
-
-      // Запускаем запись в поток
-      final stream = await _audioRecorder.startStream(config);
+      // Создаем StreamController для получения аудио данных
+      _audioStreamController = StreamController<Uint8List>();
 
       // Слушаем поток аудио данных
-      _audioStreamSubscription = stream.listen(
+      _audioStreamSubscription = _audioStreamController!.stream.listen(
         (audioData) {
           // audioData - это Uint8List с PCM16 данными
           // Логируем первый чанк для диагностики
@@ -768,6 +762,19 @@ Remember: Your goal is to be a fun, educational robot friend - KEEP RESPONSES SH
         },
       );
 
+      // Настраиваем запись: PCM16, 24000Hz, mono (как требует OpenAI)
+      final codec = Codec.pcm16;
+
+      print('📝 Конфигурация записи: PCM16, 24000Hz, mono');
+
+      // Запускаем запись в поток
+      await _audioRecorder.startRecorder(
+        codec: codec,
+        numChannels: 1,
+        sampleRate: 24000,
+        toStream: _audioStreamController!.sink,
+      );
+
       _isRecording = true;
       print('✅ Захват микрофона запущен');
 
@@ -784,17 +791,18 @@ Remember: Your goal is to be a fun, educational robot friend - KEEP RESPONSES SH
     print('⏹️ Остановка захвата микрофона...');
 
     try {
-      // 1. Отменяем подписку на поток
+      // 1. Останавливаем recorder
+      if (_audioRecorder.isRecording) {
+        await _audioRecorder.stopRecorder();
+      }
+
+      // 2. Отменяем подписку на поток
       await _audioStreamSubscription?.cancel();
       _audioStreamSubscription = null;
 
-      // 2. Останавливаем recorder
-      if (await _audioRecorder.isRecording()) {
-        await _audioRecorder.stop();
-      }
-
-      // 3. Освобождаем ресурсы recorder
-      // Пакет record автоматически освобождает микрофон при stop()
+      // 3. Закрываем StreamController
+      await _audioStreamController?.close();
+      _audioStreamController = null;
 
       _isRecording = false;
       print('✅ Захват микрофона остановлен, ресурсы освобождены');
@@ -802,6 +810,7 @@ Remember: Your goal is to be a fun, educational robot friend - KEEP RESPONSES SH
       print('⚠️ Ошибка при остановке микрофона: $e');
       _isRecording = false;
       _audioStreamSubscription = null;
+      _audioStreamController = null;
     }
   }
 
