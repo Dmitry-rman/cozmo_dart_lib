@@ -1,0 +1,26 @@
+name: record_macos
+description: macOS implementation for record package called by record_platform_interface.
+
+publish_to: none
+version: 1.1.2
+homepage: https://github.com/llfbandit/record/tree/master/record_macos
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  record_platform_interface:
+    path: ../record_platform_interface
+
+flutter:
+  plugin:
+    implements: record
+    platforms:
+      macos:
+        pluginClass: RecordMacOsPlugin

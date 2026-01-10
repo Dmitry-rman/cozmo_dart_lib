@@ -1,6 +1,7 @@
 name: cozmo_dart_lib
 description: "Cozmo Dart Library."
 version: 0.0.2
+publish_to: none
 
 environment:
   sdk: ">=2.18.0 <4.0.0"
@@ -9,7 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_webrtc: ^0.9.48+1
-  flutter_sound: ^9.12.5
+  record:
+    path: lib/third_party/record/record
   web_socket_channel: ^2.4.0
   http: ^1.2.0
 
