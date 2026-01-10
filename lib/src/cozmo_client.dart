@@ -218,11 +218,19 @@ class CozmoClient {
       final seq = data[10] | (data[11] << 8);
       final ack = data[12] | (data[13] << 8);
       _lastAck = seq;
-      if (_isSeqNewer(ack, _lastRemoteAck)) _lastRemoteAck = ack;
-      if (type == 0x07) _parsePackets(data, 14);
-      else if (type == 0x09) _parsePackets(data, 14);
-      else if (type == 0x0b) _handlePingFrame(data);
-    } catch (_) {}
+      if (_isSeqNewer(ack, _lastRemoteAck)) {
+        _lastRemoteAck = ack;
+      }
+      if (type == 0x07) {
+        _parsePackets(data, 14);
+      } else if (type == 0x09) {
+        _parsePackets(data, 14);
+      } else if (type == 0x0b) {
+        _handlePingFrame(data);
+      }
+    } catch (_) {
+      // Ignore packet parsing errors
+    }
   }
 
   void _parsePackets(Uint8List data, int offset) {

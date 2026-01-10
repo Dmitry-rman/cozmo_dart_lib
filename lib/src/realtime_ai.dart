@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:cozmo_app/custom_code/cosmo_lib/cozmo_robot.dart';
-import 'package:cozmo_app/custom_code/cosmo_lib/cozmo_utils.dart';
-import 'package:cozmo_app/custom_code/cosmo_lib/modules/audio_processor.dart';
-import 'package:cozmo_app/custom_code/ai_config.dart';
+import 'cozmo_robot.dart';
+import 'ai_config.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 /// Realtime AI для Cozmo с WebRTC и OpenAI API
@@ -561,41 +558,10 @@ class RealtimeAI {
     }
 
     try {
-      // 1. Сохраняем исходный WAV
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final originalWav = '/tmp/response_$timestamp.wav';
-      final pcmData = Uint8List.fromList(_audioBuffer);
-      final wavData = AudioProcessor.pcmToWav(pcmData);
-
-      print('💾 Сохранение в файл...');
-      final saved = await AudioProcessor.saveWavFile(originalWav, wavData);
-
-      if (!saved) {
-        print('❌ Ошибка сохранения');
-        _audioBuffer.clear();
-        return;
-      }
-
+      // Аудио данные получены от OpenAI Realtime API
+      // TODO: Implement robot audio effect processing
+      print('✅ Аудио данные получены (${_audioBuffer.length} байт, робо-эффекты отключены)');
       _audioBuffer.clear();
-
-      // 2. Применяем робо-эффекты
-      final processedWav = '/tmp/response_processed_$timestamp.wav';
-      final success = await AudioProcessor.applyRobotEffect(
-        inputWav: originalWav,
-        outputWav: processedWav,
-        pitch: 1.35,
-        tempo: 0.9,
-      );
-
-      if (!success) {
-        print('⚠️ Используем оригинальный аудио');
-        _pendingAudioFile = originalWav;
-      } else {
-        print('✅ Робо-эффекты применены');
-        _pendingAudioFile = processedWav;
-      }
-
-      print('✅ Файл помечен для воспроизведения');
     } catch (e) {
       print('❌ Ошибка обработки аудио: $e');
       onError?.call('Ошибка обработки аудио: $e');

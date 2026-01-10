@@ -23,7 +23,9 @@ class CozmoSimpleImage {
 
   void drawLine(int y) {
     if (y < 0 || y >= height) return;
-    for (int x = 0; x < width; x++) pixels[y * width + x] = 255;
+    for (int x = 0; x < width; x++) {
+      pixels[y * width + x] = 255;
+    }
     _precalculatedRle = null;
   }
 

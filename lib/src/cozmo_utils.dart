@@ -66,7 +66,12 @@ class ByteWriter {
   void writeUint8(int v) => _b.add(v & 0xFF);
   void writeUint16(int v) { _b.add(v & 0xFF); _b.add((v >> 8) & 0xFF); }
   void writeUint32(int v) { _b.add(v & 0xFF); _b.add((v >> 8) & 0xFF); _b.add((v >> 16) & 0xFF); _b.add((v >> 24) & 0xFF); }
-  void writeFloat64(double v) { var d = ByteData(8)..setFloat64(0, v, Endian.little); for(int i=0;i<8;i++) _b.add(d.getUint8(i)); }
+  void writeFloat64(double v) {
+    var d = ByteData(8)..setFloat64(0, v, Endian.little);
+    for (int i = 0; i < 8; i++) {
+      _b.add(d.getUint8(i));
+    }
+  }
   void writeBytes(List<int> v) => _b.addAll(v);
   Uint8List toUint8List() => Uint8List.fromList(_b);
 }
@@ -76,7 +81,14 @@ class ByteReader {
   int readUint8() => _d[_p++] & 0xFF;
   int readUint16() { int v = _d[_p] | (_d[_p+1] << 8); _p+=2; return v; }
   int readUint32() { int v = _d[_p] | (_d[_p+1] << 8) | (_d[_p+2] << 16) | (_d[_p+3] << 24); _p+=4; return v; }
-  double readFloat64() { var d = ByteData(8); for(int i=0;i<8;i++) d.setUint8(i, _d[_p+i]); _p+=8; return d.getFloat64(0, Endian.little); }
+  double readFloat64() {
+    var d = ByteData(8);
+    for (int i = 0; i < 8; i++) {
+      d.setUint8(i, _d[_p + i]);
+    }
+    _p += 8;
+    return d.getFloat64(0, Endian.little);
+  }
 }
 
 List<int> uint16(int v) => [v & 0xFF, (v >> 8) & 0xFF];
