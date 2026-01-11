@@ -10,6 +10,8 @@ import 'cozmo_drive.dart';
 import 'cozmo_lift.dart';
 import 'cozmo_anim_controller.dart';
 import 'cozmo_simple_image.dart';
+import 'cozmo_face.dart';
+import 'cozmo_eye_animation_controller.dart'; // 🆕 Изменено на импорт из файла
 
 class CozmoRobot {
   final CozmoClient _client = CozmoClient.instance;
@@ -22,10 +24,17 @@ class CozmoRobot {
   late final CozmoDrive drive;
   late final CozmoLift lift;
   late final CozmoAnimController animController;
+  late final CozmoFace face;
+  late final EyeAnimationController eyeController;
 
   CozmoRobot._internal() {
-    // Сначала создаем контроллер
+    // Сначала создаем контроллер анимаций
     animController = CozmoAnimController(_client);
+    
+    // 🆕 Создаем лицо и контроллер анимаций глаз
+    face = CozmoFace();
+    eyeController = EyeAnimationController(_client, face, animController);
+    
     // Передаем его в аудио
     audio = CozmoAudio(_client, animController);
     
@@ -61,13 +70,20 @@ class CozmoRobot {
       print('👀 Displaying test eyes...');
       final eyesImage = CozmoSimpleImage.createEyes();
       displayImage(eyesImage);
-
+      
       print('✅ Robot Ready & Screen ON');
+      
+      // 🆕 Активируем контроллер анимаций глаз после инициализации
+      print('👀 Starting Eye Animation Controller...');
+      eyeController.activate();
     }
     return res;
   }
 
   void disconnect() {
+    // 🆕 Деактивируем контроллер глаз перед отключением
+    eyeController.deactivate();
+    
     animController.stop();
     _client.disconnect();
   }

@@ -263,4 +263,33 @@ class CozmoFace {
     _rightEyeSize = 0.32;
     _rightEyelid = 0.1;
   }
+  
+  // ============================================================
+  // ПУБЛИЧНЫЕ СЕТТЕРЫ ДЛЯ КОМПОНЕНТОВ
+  // ============================================================
+  
+  /// Сеттеры для параметров глаз
+  
+  // Левый глаз
+  void setLeftEyeX(double value) => _leftEyeX = value.clamp(0.0, 1.0);
+  void setLeftEyeY(double value) => _leftEyeY = value.clamp(0.0, 1.0);
+  void setLeftEyeSize(double value) => _leftEyeSize = value.clamp(0.0, 0.5);
+  void setLeftEyelid(double value) => _leftEyelid = value.clamp(-0.5, 1.0);
+  
+  // Правый глаз
+  void setRightEyeX(double value) => _rightEyeX = value.clamp(0.0, 1.0);
+  void setRightEyeY(double value) => _rightEyeY = value.clamp(0.0, 1.0);
+  void setRightEyeSize(double value) => _rightEyeSize = value.clamp(0.0, 0.5);
+  void setRightEyelid(double value) => _rightEyelid = value.clamp(-0.5, 1.0);
+  
+  // Геттеры
+  double get leftEyeX => _leftEyeX;
+  double get leftEyeY => _leftEyeY;
+  double get leftEyeSize => _leftEyeSize;
+  double get leftEyelid => _leftEyelid;
+  
+  double get rightEyeX => _rightEyeX;
+  double get rightEyeY => _rightEyeY;
+  double get rightEyeSize => _rightEyeSize;
+  double get rightEyelid => _rightEyelid;
 }
