@@ -62,18 +62,24 @@ class EyeAnimationController {
     
     // Запускаем анимацию ожидания по умолчанию
     _startWandering();
+    
+    // Принудительно обновляем лицо сразу после активации
+    _needsUpdate = true;
   }
   
   /// Запускает таймер для буферизированного обновления изображения
   void _startUpdateTimer() {
+    print('🕐 Starting eye update timer with 200ms interval');
     _updateTimer?.cancel();
     _updateTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
       if (!_isActive) {
+        print('🕐 Eye update timer canceled (inactive)');
         timer.cancel();
         return;
       }
       
       if (_needsUpdate) {
+        print('🕐 Eye update timer: needs update = true');
         _needsUpdate = false;
         _updateFace();
       }
@@ -347,10 +353,14 @@ class EyeAnimationController {
   
   /// Обновляет отображение лица на роботе
   void _updateFace() {
-    if (!_client.isConnected) return; // Проверяем соединение перед отправкой
+    if (!_client.isConnected) {
+      print('🚫 Eye controller update: client not connected');
+      return; // Проверяем соединение перед отправкой
+    }
     
     _face.render();
     final faceData = _face.encode();
+    print('👀 Eye controller update: sending ${faceData.length} bytes');
     // Отправляем напрямую через простой UDP пакет, минуя надежный протокол
     _sendDisplayImageCommand(faceData);
   }
