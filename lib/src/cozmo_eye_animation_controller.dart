@@ -37,7 +37,7 @@ class EyeAnimationController {
   
   // Параметры анимации
   Duration _blinkInterval = const Duration(seconds: 4);
-  Duration _wanderInterval = const Duration(milliseconds: 2000);
+  Duration _wanderInterval = const Duration(milliseconds: 3000); // Увеличили интервал для снижения нагрузки
   double _wanderAmplitude = 0.05;
   
   // Состояние

@@ -43,7 +43,7 @@ class CozmoRobot {
     lift = CozmoLift(_client);
   }
 
-  Future<String?> connect() async {
+  Future<String?> connect({bool activateEyeController = true}) async {
     final res = await _client.connect();
     
     if (res == null) {
@@ -73,9 +73,16 @@ class CozmoRobot {
       
       print('✅ Robot Ready & Screen ON');
       
-      // 🆕 Активируем контроллер анимаций глаз после инициализации
-      print('👀 Starting Eye Animation Controller...');
-      eyeController.activate();
+      // 🆕 Активируем контроллер анимаций глаз после инициализации с задержкой
+      if (activateEyeController) {
+        print('👀 Starting Eye Animation Controller...');
+        // Задержка перед активацией, чтобы не прерывать соединение
+        Future.delayed(const Duration(seconds: 1), () {
+          eyeController.activate();
+        });
+      } else {
+        print('👀 Eye Animation Controller disabled');
+      }
     }
     return res;
   }
