@@ -194,6 +194,12 @@ class CozmoClient {
       _lastSendTime = DateTime.now();
     } catch (e) { }
   }
+  
+  /// Отправляет пакет напрямую, минуя надежный протокол
+  void sendRaw(List<int> data) {
+    final payload = Uint8List.fromList(data);
+    _sendRaw(payload);
+  }
 
   void _startReceiveLoop() {
     _recvSubscription = _socket.listen((event) {

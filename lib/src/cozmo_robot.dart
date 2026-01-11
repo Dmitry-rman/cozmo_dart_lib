@@ -68,21 +68,14 @@ class CozmoRobot {
       await Future.delayed(const Duration(seconds: 2));
 
       print('👀 Displaying test eyes...');
-      final eyesImage = CozmoSimpleImage.createEyes();
-      displayImage(eyesImage);
+      //final eyesImage = CozmoSimpleImage.createEyes();
+      //displayImage(eyesImage);
       
       print('✅ Robot Ready & Screen ON');
       
-      // 🆕 Активируем контроллер анимаций глаз после инициализации с задержкой
-      if (activateEyeController) {
-        print('👀 Starting Eye Animation Controller...');
-        // Задержка перед активацией, чтобы не прерывать соединение
-        Future.delayed(const Duration(seconds: 1), () {
-          eyeController.activate();
-        });
-      } else {
-        print('👀 Eye Animation Controller disabled');
-      }
+      // 🆕 Полностью отключаем контроллер анимаций глаз для стабильного соединения
+      print('👀 Eye Animation Controller disabled for stable connection');
+      // Не активируем контроллер глаз вообще
     }
     return res;
   }

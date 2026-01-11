@@ -1,6 +1,7 @@
 library cozmo_eye_animation_controller;
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'cozmo_client.dart';
@@ -37,11 +38,15 @@ class EyeAnimationController {
   
   // Параметры анимации
   Duration _blinkInterval = const Duration(seconds: 4);
-  Duration _wanderInterval = const Duration(milliseconds: 3000); // Увеличили интервал для снижения нагрузки
+  Duration _wanderInterval = const Duration(milliseconds: 200); // Как в pycozmo (5 FPS)
   double _wanderAmplitude = 0.05;
   
   // Состояние
   bool _isActive = false;
+  
+  // Буфер для снижения частоты обновления
+  bool _needsUpdate = false;
+  Timer? _updateTimer;
   
   EyeAnimationController(this._client, this._face, this._animController);
   
@@ -52,8 +57,33 @@ class EyeAnimationController {
     _isActive = true;
     print('👀 Eye Animation Controller activated');
     
+    // Запускаем таймер для буферизированного обновления изображения (с частотой 5 FPS)
+    _startUpdateTimer();
+    
     // Запускаем анимацию ожидания по умолчанию
     _startWandering();
+  }
+  
+  /// Запускает таймер для буферизированного обновления изображения
+  void _startUpdateTimer() {
+    _updateTimer?.cancel();
+    _updateTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
+      if (!_isActive) {
+        timer.cancel();
+        return;
+      }
+      
+      if (_needsUpdate) {
+        _needsUpdate = false;
+        _updateFace();
+      }
+    });
+  }
+  
+  /// Останавливает таймер обновления
+  void _stopUpdateTimer() {
+    _updateTimer?.cancel();
+    _updateTimer = null;
   }
   
   /// Деактивирует контроллер и останавливает все анимации
@@ -62,6 +92,7 @@ class EyeAnimationController {
     
     _isActive = false;
     stopAnimation();
+    _stopUpdateTimer();
     print('👀 Eye Animation Controller deactivated');
   }
   
@@ -109,6 +140,7 @@ class EyeAnimationController {
     _animationTimer = null;
     _blinkTimer?.cancel();
     _blinkTimer = null;
+    _stopUpdateTimer();
     _currentAnimation = EyeAnimationType.none;
   }
   
@@ -124,13 +156,13 @@ class EyeAnimationController {
     // Закрываем веки
     _face.setLeftEyelid(1.0);
     _face.setRightEyelid(1.0);
-    _updateFace();
+    _needsUpdate = true;
     
     // Открываем веки через 150мс
     _animationTimer = Timer(const Duration(milliseconds: 150), () {
       _face.setLeftEyelid(0.0);
       _face.setRightEyelid(0.0);
-      _updateFace();
+      _needsUpdate = true;
       
       // Восстанавливаем предыдущую анимацию
       if (previousAnimation == EyeAnimationType.blinkLoop) {
@@ -158,13 +190,13 @@ class EyeAnimationController {
     // Закрываем веки
     _face.setLeftEyelid(1.0);
     _face.setRightEyelid(1.0);
-    _updateFace();
+    _needsUpdate = true;
     
     // Открываем веки через 150мс
     _animationTimer = Timer(const Duration(milliseconds: 150), () {
       _face.setLeftEyelid(0.0);
       _face.setRightEyelid(0.0);
-      _updateFace();
+      _needsUpdate = true;
     });
   }
   
@@ -209,7 +241,7 @@ class EyeAnimationController {
       _face.setRightEyeX(rightX);
       _face.setRightEyeY(rightY);
       
-      _updateFace();
+      _needsUpdate = true;
     });
   }
   
@@ -250,7 +282,7 @@ class EyeAnimationController {
       _face.setLeftEyeSize(eyeSize);
       _face.setRightEyeSize(eyeSize);
       
-      _updateFace();
+      _needsUpdate = true;
     });
   }
   
@@ -285,41 +317,56 @@ class EyeAnimationController {
       _face.setLeftEyeSize(eyeSize);
       _face.setRightEyeSize(eyeSize);
       
-      _updateFace();
+      _needsUpdate = true;
     });
   }
   
   /// Устанавливает счастливое выражение глаз
   void setHappy() {
     _face.setHappy();
-    _updateFace();
+    _needsUpdate = true;
   }
   
   /// Устанавливает грустное выражение глаз
   void setSad() {
     _face.setSad();
-    _updateFace();
+    _needsUpdate = true;
   }
   
   /// Устанавливает удивленное выражение глаз
   void setSurprised() {
     _face.setSurprised();
-    _updateFace();
+    _needsUpdate = true;
   }
   
   /// Устанавливает задумчивое выражение глаз
   void setThinking() {
     _face.setThinking();
-    _updateFace();
+    _needsUpdate = true;
   }
   
   /// Обновляет отображение лица на роботе
   void _updateFace() {
+    if (!_client.isConnected) return; // Проверяем соединение перед отправкой
+    
     _face.render();
     final faceData = _face.encode();
-    // Создаем payload с заголовком [Flags=3, ImgID=1, ChunkID=0]
-    final payload = [0x03, 0x01, 0x00] + faceData;
-    _animController.displayImage(Uint8List.fromList(payload));
+    // Отправляем напрямую через простой UDP пакет, минуя надежный протокол
+    _sendDisplayImageCommand(faceData);
+  }
+  
+  /// Отправляет команду отображения изображения напрямую через клиент
+  void _sendDisplayImageCommand(List<int> faceData) {
+    // Используем клиент для отправки, но без надежного протокола
+    final payload = [
+      0x97, // DisplayImage command ID
+      0x00, // Reserved
+      faceData.length, // Image size
+      ...faceData // Image data
+    ];
+    
+    // Отправляем напрямую через sendRaw, минуя надежный протокол
+    _client.sendRaw(payload);
   }
   
   /// Устанавливает интервал моргания
