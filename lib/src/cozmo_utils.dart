@@ -27,6 +27,9 @@ class CozmoCmd {
   static const int enableRobotState = 0x45; // SetOrigin
   static const int syncTime = 0x4b;
   static const int enableAnimState = 0x9f;
+  static const int enableCamera = 0x4c;     // Enable/disable camera
+  static const int enableColorImages = 0x66; // Enable color images
+  static const int imagePacket = 0x0b;      // Image data packet
 }
 
 class CozmoException implements Exception {

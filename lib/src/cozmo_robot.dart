@@ -12,6 +12,7 @@ import 'cozmo_anim_controller.dart';
 import 'cozmo_simple_image.dart';
 import 'cozmo_face.dart';
 import 'cozmo_eye_animation_controller.dart'; // 🆕 Изменено на импорт из файла
+import 'cozmo_camera.dart';
 
 class CozmoRobot {
   final CozmoClient _client = CozmoClient.instance;
@@ -26,38 +27,50 @@ class CozmoRobot {
   late final CozmoAnimController animController;
   late final CozmoFace face;
   late final EyeAnimationController eyeController;
+  late final CozmoCamera camera;
 
   CozmoRobot._internal() {
     // Сначала создаем контроллер анимаций
     animController = CozmoAnimController(_client);
-    
+
     // 🆕 Создаем лицо и контроллер анимаций глаз
     face = CozmoFace();
     eyeController = EyeAnimationController(_client, face, animController);
-    
+
     // Передаем его в аудио
     audio = CozmoAudio(_client, animController);
-    
+
     head = CozmoHead(_client);
     drive = CozmoDrive(_client);
     lift = CozmoLift(_client);
+
+    // Create camera instance
+    camera = _client.getCamera();
   }
 
   Future<String?> connect({bool activateEyeController = true}) async {
     final res = await _client.connect();
-    
+
     if (res == null) {
       print('⏳ Initializing robot systems...');
 
-      _client.sendCommand(CozmoCmd.robotState, [1]);
+      // Enable robot (0x25) - CRITICAL: Send TWICE to trigger BodyInfo and enable communication
+      // This is required before camera or any other features will work
+      print('🔌 Enabling robot communication...');
+      _client.sendCommand(CozmoCmd.robotState, []);  // Empty Enable packet
       await Future.delayed(const Duration(milliseconds: 50));
+      _client.sendCommand(CozmoCmd.robotState, []);  // Send AGAIN (triggers BodyInfo)
+      await Future.delayed(const Duration(milliseconds: 100));
 
+      // Sync time - enables RobotState and ObjectAvailable events
+      print('⏰ Syncing time...');
       final now = DateTime.now().millisecondsSinceEpoch;
       _client.sendCommand(CozmoCmd.syncTime, [...uint32(now), ...uint32(0)]);
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 100));
 
+      // Set robot state
       _client.sendCommand(CozmoCmd.enableRobotState, [...uint32(0), ...uint32(0), ...uint32(1), ...float32(0.0), ...float32(0.0), ...uint32(0x80000000)]);
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 100));
 
       print('🎬 Starting Animation Controller...');
       animController.start();
@@ -126,4 +139,29 @@ class CozmoRobot {
   void clearScreen() {
     animController.clearScreen();
   }
+
+  // --- Camera methods ---
+
+  /// Enable or disable the camera
+  ///
+  /// [enable] - true to enable camera, false to disable
+  /// [color] - true to enable color images (default: grayscale)
+  /// [resolution] - image resolution (default: 320x240)
+  void enableCamera({
+    bool enable = true,
+    bool color = false,
+    CozmoImageResolution resolution = CozmoImageResolution.res320x240,
+  }) {
+    camera.enableCamera(enable: enable, color: color, resolution: resolution);
+  }
+
+  /// Subscribe to camera image events
+  ///
+  /// Returns a StreamSubscription that can be cancelled when done
+  StreamSubscription<CozmoCameraImage> onCameraImage(void Function(CozmoCameraImage) callback) {
+    return camera.onImage(callback);
+  }
+
+  /// Get the camera image stream
+  Stream<CozmoCameraImage> get cameraImageStream => camera.imageStream;
 }

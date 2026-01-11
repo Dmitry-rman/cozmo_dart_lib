@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'dart:typed_data';
 import 'cozmo_utils.dart';
+import 'cozmo_camera.dart';
 
 class _SentPacket {
   final int seq;
@@ -55,6 +56,10 @@ class CozmoClient {
   bool get isAudioPlaying => _isAudioPlaying;
   void setAudioPlaying(bool playing) => _isAudioPlaying = playing;
 
+  // Camera support
+  CozmoCamera? _camera;
+  CozmoCamera? get camera => _camera;
+
   Future<String?> connect({Duration timeout = const Duration(seconds: 10)}) async {
     if (_isConnected) return 'Already connected';
     try {
@@ -93,6 +98,12 @@ class CozmoClient {
     _lastSendTime = DateTime.now();
     _lastPacketTime = null;
     _isAudioPlaying = false;
+  }
+
+  /// Get or create camera instance
+  CozmoCamera getCamera() {
+    _camera ??= CozmoCamera(this);
+    return _camera!;
   }
 
   Future<void> disconnect() async {
@@ -247,9 +258,18 @@ class CozmoClient {
       final len = data[pos] | (data[pos+1] << 8);
       pos += 2;
       if (pos + len > data.length) break;
+
       if (type == 0x04 && len > 0) {
         final cmdId = data[pos];
         if (cmdId == 0xc9 || cmdId == 0xee) _robotReady = true;
+      }
+      // Handle image packets (type 0x05 = EVENT, packet_id 0xf2 = ImageChunk)
+      if (type == 0x05 && len > 0) {
+        final cmdId = data[pos];
+        if (cmdId == 0xf2 && _camera != null) { // ImageChunk packet
+          final packetData = Uint8List.sublistView(data, pos, pos + len);
+          _camera!.handleImagePacket(packetData);
+        }
       }
       pos += len;
     }
